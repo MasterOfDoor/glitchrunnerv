@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_RAM_ElectricBG
+  m_Name: MAT_RAM_ElectricBG 1
   m_Shader: {fileID: -6465566751694194690, guid: 01e6638f18124874199c1b48b858287e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -66,10 +66,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ElectricIntensity: 2
+    - _ElectricIntensity: 2.2
     - _ElectricThreshold: 0.55
     - _EnableExternalAlpha: 0
-    - _FlowSpeed: 0.85
+    - _FlowSpeed: 0.35
     - _GlitchAmount: 0.005
     - _GlitchSpeed: 6
     - _GlobalIntensity: 1
@@ -79,7 +79,7 @@ Material:
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ElectricColor: {r: 0, g: 1, b: 1, a: 0.5411765}
+    - _ElectricColor: {r: 1, g: 0, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
