@@ -2,39 +2,59 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 
+/// <summary>
+/// Arka planda matrix animasyonu çizer.
+/// Animasyon bitince OnFinished callback'i tetiklenir.
+/// Time.unscaledDeltaTime kullanır — timeScale=0 ile çalışır.
+/// </summary>
 public class MatrixBitWriter : MonoBehaviour
 {
+    [Header("Referanslar")]
     public TMP_Text textArea;
 
-    public int columns = 60;
-    public int rows = 20;
+    [Header("Grid Boyutu")]
+    public int columns        = 70;
+    public int rows           = 14;
 
+    [Header("Animasyon Hızı")]
     public float rowFillInterval = 0.05f;
 
-    private char[,] buffer;
-    private bool[,] mask;
-
-    private int currentRow;
-    private float timer;
-
-    private bool finished;
-
-    private StringBuilder sb;
-
+    // Callback — PuzzleManager tarafından atanır
     public System.Action OnFinished;
 
-    void Start()
-    {
-        buffer = new char[rows, columns];
-        mask = new bool[rows, columns];
-        sb = new StringBuilder(rows * (columns + 5));
+    // ── Private ───────────────────────────────────────────────────────────
+    private char[,]  _buffer;
+    private bool[,]  _mask;
+    private int      _currentRow;
+    private float    _timer;
+    private bool     _finished;
+    private StringBuilder _sb;
 
-        // Başlangıçta tüm buffer boş
+    // Renk havuzu — daha canlı cyberpunk görünüm
+    private static readonly string[] Colors =
+    {
+        "#00FF88", "#00CC66", "#FFDD00", "#FF5500", "#00E5FF"
+    };
+
+    // ─────────────────────────────────────────────────────────────────────
+    void OnEnable()
+    {
+        // Her açılışta sıfırla (puzzle tekrar oynanabilir)
+        Init();
+    }
+
+    void Init()
+    {
+        _buffer     = new char[rows, columns];
+        _mask       = new bool[rows, columns];
+        _sb         = new StringBuilder(rows * (columns + 30));
+        _finished   = false;
+        _currentRow = rows - 1;
+        _timer      = 0f;
+
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < columns; c++)
-                buffer[r, c] = ' ';
-
-        currentRow = rows - 1;
+                _buffer[r, c] = ' ';
 
         GenerateMask();
         Render();
@@ -42,61 +62,67 @@ public class MatrixBitWriter : MonoBehaviour
 
     void Update()
     {
-        if (finished)
-            return;
+        if (_finished) return;
 
-        timer += Time.unscaledDeltaTime;
+        _timer += Time.unscaledDeltaTime;
+        if (_timer < rowFillInterval) return;
 
-        if (timer >= rowFillInterval)
+        _timer = 0f;
+        FillRow(_currentRow);
+        Render();
+
+        _currentRow--;
+
+        if (_currentRow < 0)
         {
-            timer = 0f;
-
-            FillRow(currentRow);
-            Render();
-
-            currentRow--;
-
-            if (currentRow < 0)
-            {
-                finished = true;
-                OnFinished?.Invoke();
-            }
+            _finished = true;
+            OnFinished?.Invoke();
         }
     }
 
+    // ─────────────────────────────────────────────────────────────────────
     void FillRow(int r)
     {
         for (int c = 0; c < columns; c++)
         {
-            if (mask[r, c])
-                buffer[r, c] = Random.value > 0.8f ? '1' : '0';
-            else
-                buffer[r, c] = ' '; // mask dışı tamamen boş
+            _buffer[r, c] = _mask[r, c]
+                ? (Random.value > 0.75f ? '1' : '0')
+                : ' ';
         }
     }
 
     void Render()
     {
-        sb.Clear();
+        _sb.Clear();
 
         for (int r = 0; r < rows; r++)
         {
             for (int c = 0; c < columns; c++)
             {
-                if (mask[r, c])
-                    sb.Append("<color=#FFDD55>").Append(buffer[r, c]).Append("</color>");
+                if (_mask[r, c] && _buffer[r, c] != ' ')
+                {
+                    // Rengi satır ve sütuna göre varyasyon ekle
+                    string col = Colors[(r + c) % Colors.Length];
+                    _sb.Append("<color=").Append(col).Append(">")
+                       .Append(_buffer[r, c])
+                       .Append("</color>");
+                }
                 else
-                    sb.Append(" "); // mask dışı boş
+                {
+                    _sb.Append(' ');
+                }
             }
-            sb.Append('\n');
+            _sb.Append('\n');
         }
 
-        textArea.text = sb.ToString();
+        if (textArea != null)
+            textArea.text = _sb.ToString();
     }
 
     void GenerateMask()
     {
-        string[] lines = new string[]
+        // "FIX THIS INDEX" yazısı — ASCII art
+        string[] lines =
         {
             "FFF  I  X X    TTT  H  H  EEEE     I  N  N  DDD  EEEE  X X",
             "F    I  X X     T   H  H  E        I  NN N  D  D E     X X",
@@ -105,18 +131,15 @@ public class MatrixBitWriter : MonoBehaviour
             "F    I  X X     T   H  H  EEEE     I  N  N  DDD  EEEE  X X"
         };
 
-        int startRow = 7;
+        int startRow = (rows - lines.Length) / 2;
         int startCol = 2;
 
         for (int r = 0; r < lines.Length; r++)
         {
-            for (int c = 0; c < lines[r].Length; c++)
+            for (int c = 0; c < lines[r].Length && startCol + c < columns; c++)
             {
-                if (startRow + r < rows && startCol + c < columns)
-                {
-                    if (lines[r][c] != ' ')
-                        mask[startRow + r, startCol + c] = true;
-                }
+                if (startRow + r < rows && lines[r][c] != ' ')
+                    _mask[startRow + r, startCol + c] = true;
             }
         }
     }

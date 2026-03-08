@@ -105,8 +105,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5474764417696388052}
   - {fileID: 5847626713392130816}
+  - {fileID: 5474764417696388052}
   - {fileID: 1683648922863522395}
   - {fileID: 4754023131237973658}
   m_Father: {fileID: 8766069028576910326}
@@ -449,6 +449,12 @@ MonoBehaviour:
   - systemSafe();
   autoStartOnPlay: 1
   timeLimit: 60
+  OnPuzzleCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPuzzleFailed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6824371007896953659
 GameObject:
   m_ObjectHideFlags: 0
