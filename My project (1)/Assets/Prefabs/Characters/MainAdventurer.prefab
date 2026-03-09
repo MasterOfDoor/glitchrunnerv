@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7303680897289641433}
   - component: {fileID: 1754895112651084907}
   - component: {fileID: 1678441004945361304}
+  - component: {fileID: 2243660350795272564}
   m_Layer: 3
   m_Name: MainAdventurer
   m_TagString: Untagged
@@ -198,3 +199,17 @@ MonoBehaviour:
   dashForce: 3
   maxAmmo: 30
   reloadTime: 2
+--- !u!114 &2243660350795272564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2585212053847867763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 365adf781e29380478111bb4a6ce2eee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
+  inventoryPanel: {fileID: 0}
+  isInventoryOpen: 0

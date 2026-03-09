@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class AsılScript : MonoBehaviour // Dosya adınla aynı olmalı!
+public class AsılScript : MonoBehaviour
 {
     [Header("Hareket Ayarları")]
     public float walkSpeed = 5f;
@@ -14,56 +14,98 @@ public class AsılScript : MonoBehaviour // Dosya adınla aynı olmalı!
     private int currentAmmo;
     private bool isReloading = false;
 
-    // --- HATAYI ÇÖZEN DEĞİŞKENLER BURADA ---
+    [Header("Envanter Sistemi")]
+    public GameObject inventoryPanel; // LÜTFEN INSPECTOR'DAN PANELİ BURAYA SÜRÜKLE
+    private bool isInventoryOpen = false;
+
+    // Bileşenler ve Değişkenler
     private Rigidbody2D rb;
     private Animator anim;
     private Vector2 moveInput;
     private float currentSpeed;
-    private int weaponType = 0; // 0=Normal, 1=Gun, 2=Spear
-    // ---------------------------------------
+    private int weaponType = 0; 
 
     void Start()
     {
-        // Bilgisayara bu isimlerin ne olduğunu öğretiyoruz
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         currentAmmo = maxAmmo;
+
+        // Oyun başlarken her şeyi sıfırla
+        Time.timeScale = 1f;
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(false);
     }
 
     void Update()
     {
-        // 1. HAREKET GİRDİLERİ
+        // --- 1. ENVANTER AÇMA/KAPATMA ---
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            ToggleInventory();
+        }
+
+        // --- 2. DURAKLATMA KONTROLÜ ---
+        if (isInventoryOpen)
+        {
+            rb.linearVelocity = Vector2.zero;
+            anim.SetFloat("Speed", 0);
+            return; // Envanter açıkken aşağıyı okuma
+        }
+
+        // --- 3. HAREKET GİRDİLERİ ---
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
 
-        // 2. KOŞMA KONTROLÜ (R Tuşu)
         bool isRunning = Input.GetKey(KeyCode.R);
         currentSpeed = isRunning ? runSpeed : walkSpeed;
 
-        // 3. SİLAH DEĞİŞTİRME (1, 2, 3)
+        // --- 4. SİLAH DEĞİŞTİRME ---
         if (Input.GetKeyDown(KeyCode.Alpha1)) weaponType = 0;
         if (Input.GetKeyDown(KeyCode.Alpha2)) weaponType = 1;
         if (Input.GetKeyDown(KeyCode.Alpha3)) weaponType = 2;
 
-        // 4. DASH (Sol Shift)
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        // --- 5. DASH (Shift) ---
+        if (Input.GetKeyDown(KeyCode.LeftShift) && moveInput != Vector2.zero)
         {
             anim.SetTrigger("doDash");
             rb.AddForce(moveInput * dashForce, ForceMode2D.Impulse);
         }
 
-        // 5. ZIPLAMA (Space)
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            anim.SetTrigger("doJump");
-        }
+        // --- 6. ZIPLAMA (Space) ---
+        if (Input.GetKeyDown(KeyCode.Space)) anim.SetTrigger("doJump");
 
-        // 6. SALDIRI / ATEŞ (Sol Tık)
+        // --- 7. ATEŞ / SALDIRI ---
         HandleAttack();
 
-        // 7. ANIMATOR GÜNCELLEME
+        // --- 8. ANIMATOR GÜNCELLE ---
         UpdateAnimator();
+    }
+
+    void ToggleInventory()
+    {
+        if (inventoryPanel == null)
+        {
+            Debug.LogError("LÜTFEN: Karakterin üstündeki Inventory Panel kutusuna Paneli sürükle!");
+            return;
+        }
+
+        isInventoryOpen = !isInventoryOpen;
+        inventoryPanel.SetActive(isInventoryOpen);
+
+        if (isInventoryOpen)
+        {
+            Time.timeScale = 0f; // Zamanı durdur
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Time.timeScale = 1f; // Zamanı başlat
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     void HandleAttack()
@@ -73,10 +115,7 @@ public class AsılScript : MonoBehaviour // Dosya adınla aynı olmalı!
             if (Input.GetMouseButton(0) && currentAmmo > 0 && !isReloading)
             {
                 anim.SetBool("isShooting", true);
-                if (Time.frameCount % 10 == 0) 
-                {
-                    currentAmmo--;
-                }
+                if (Time.frameCount % 10 == 0) currentAmmo--;
             }
             else
             {
@@ -90,10 +129,7 @@ public class AsılScript : MonoBehaviour // Dosya adınla aynı olmalı!
         }
         else if (weaponType == 2) // SPEAR
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                anim.SetTrigger("doAttack");
-            }
+            if (Input.GetMouseButtonDown(0)) anim.SetTrigger("doAttack");
         }
     }
 
@@ -110,23 +146,20 @@ public class AsılScript : MonoBehaviour // Dosya adınla aynı olmalı!
 
     void FixedUpdate()
     {
-        rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
+        if (!isInventoryOpen)
+        {
+            rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
+        }
     }
 
     void UpdateAnimator()
     {
         anim.SetFloat("MoveX", moveInput.x);
         anim.SetFloat("MoveY", moveInput.y);
-
         float animSpeed = moveInput.magnitude;
-        if (animSpeed > 0)
-        {
-            animSpeed = Input.GetKey(KeyCode.R) ? 1f : 0.5f;
-        }
+        if (animSpeed > 0) animSpeed = Input.GetKey(KeyCode.R) ? 1f : 0.5f;
         anim.SetFloat("Speed", animSpeed);
         anim.SetInteger("WeaponType", weaponType);
-        
-        bool isAiming = Input.GetMouseButton(1);
-        anim.SetBool("isAiming", isAiming);
+        anim.SetBool("isAiming", Input.GetMouseButton(1));
     }
 }
