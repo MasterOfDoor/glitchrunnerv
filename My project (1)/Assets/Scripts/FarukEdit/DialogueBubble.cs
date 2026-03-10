@@ -63,6 +63,15 @@ public class DialogueBubble : MonoBehaviour
         _visible = false;
     }
 
+    /// <summary>Metni anında gösterir (yazma efekti yok). E ile ilerleme için — Hide() ile kapat.</summary>
+    public void ShowLineInstant(string line)
+    {
+        if (_activeRoutine != null) { StopCoroutine(_activeRoutine); _activeRoutine = null; }
+        if (bubbleText != null) bubbleText.text = line ?? "";
+        if (bubbleRoot != null) bubbleRoot.SetActive(true);
+        _visible = true;
+    }
+
     public bool IsVisible => _visible;
 
     // ─────────────────────────────────────────────────────────────────────

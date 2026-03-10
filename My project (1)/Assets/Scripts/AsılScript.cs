@@ -18,7 +18,7 @@ public class AsılScript : MonoBehaviour
     public GameObject inventoryPanel; // LÜTFEN INSPECTOR'DAN PANELİ BURAYA SÜRÜKLE
     private bool isInventoryOpen = false;
 
-    // Bileşenler ve Değişkenler
+    private bool isDead = false;
     private Rigidbody2D rb;
     private Animator anim;
     private Vector2 moveInput;
@@ -39,18 +39,18 @@ public class AsılScript : MonoBehaviour
 
     void Update()
     {
-        // --- 1. ENVANTER AÇMA/KAPATMA ---
-        if (Input.GetKeyDown(KeyCode.E))
+        // --- 1. ENVANTER AÇMA/KAPATMA (Tab) ---
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleInventory();
         }
 
         // --- 2. DURAKLATMA KONTROLÜ ---
-        if (isInventoryOpen)
+        if (isInventoryOpen || isDead)
         {
             rb.linearVelocity = Vector2.zero;
             anim.SetFloat("Speed", 0);
-            return; // Envanter açıkken aşağıyı okuma
+            return;
         }
 
         // --- 3. HAREKET GİRDİLERİ ---
@@ -61,10 +61,10 @@ public class AsılScript : MonoBehaviour
         bool isRunning = Input.GetKey(KeyCode.R);
         currentSpeed = isRunning ? runSpeed : walkSpeed;
 
-        // --- 4. SİLAH DEĞİŞTİRME ---
+        // --- 4. SİLAH DEĞİŞTİRME (sadece envanterde varsa) ---
         if (Input.GetKeyDown(KeyCode.Alpha1)) weaponType = 0;
-        if (Input.GetKeyDown(KeyCode.Alpha2)) weaponType = 1;
-        if (Input.GetKeyDown(KeyCode.Alpha3)) weaponType = 2;
+        if (Input.GetKeyDown(KeyCode.Alpha2) && GameState.Instance != null && GameState.Instance.HasItemInInventory("gun")) weaponType = 1;
+        if (Input.GetKeyDown(KeyCode.Alpha3) && GameState.Instance != null && GameState.Instance.HasItemInInventory("spear")) weaponType = 2;
 
         // --- 5. DASH (Shift) ---
         if (Input.GetKeyDown(KeyCode.LeftShift) && moveInput != Vector2.zero)
@@ -87,7 +87,13 @@ public class AsılScript : MonoBehaviour
     {
         if (inventoryPanel == null)
         {
-            Debug.LogError("LÜTFEN: Karakterin üstündeki Inventory Panel kutusuna Paneli sürükle!");
+            inventoryPanel = GameObject.Find("InventoryPanel");
+            if (inventoryPanel == null)
+                inventoryPanel = InventoryPanelBuilder.Build();
+        }
+        if (inventoryPanel == null)
+        {
+            Debug.LogError("Envanter paneli bulunamadı.");
             return;
         }
 
@@ -146,10 +152,42 @@ public class AsılScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isInventoryOpen)
+        if (!isInventoryOpen && !isDead)
         {
             rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
         }
+        else if (isDead && rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("FallArea") && !isDead)
+            StartCoroutine(DieAndRespawn());
+    }
+
+    IEnumerator DieAndRespawn()
+    {
+        isDead = true;
+        if (anim != null)
+        {
+            anim.SetBool("isDead", true);
+            anim.SetTrigger("doDie");
+        }
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+        yield return new WaitForSeconds(1.07f);
+        GameObject spawn = GameObject.Find("SpawnPoint");
+        if (spawn != null)
+            transform.position = new Vector3(spawn.transform.position.x, spawn.transform.position.y, transform.position.z);
+        if (rb != null) rb.simulated = true;
+        isDead = false;
+        if (anim != null) anim.SetBool("isDead", false);
     }
 
     void UpdateAnimator()
