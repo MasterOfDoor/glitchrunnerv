@@ -1,3 +1,10 @@
+# OS / editor
+.DS_Store
+**/.DS_Store
+**/__MACOSX/
+**/._*
+.cursor/
+
 # Unity - ignore at any depth
 **/[Ll]ibrary/
 **/[Tt]emp/

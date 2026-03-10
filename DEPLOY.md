@@ -6,11 +6,12 @@ Bu dosyada: WebGL build alma, Vercel’e yükleme ve **Vercel’de ayarlaman ger
 
 ## 1. Unity’de WebGL build
 
-1. **File → Build Settings**
-2. **Platform:** WebGL → **Switch Platform**
-3. **Build** veya **Build And Run** → çıktıyı **`My project (1)/Builds/WEBGL`** klasörüne al.
+1. **Edit → Project Settings → Player** → **WebGL** sekmesi → **Publishing Settings**
+2. **Compression Format** değerini **Disabled** yap.  
+   (Vercel zaten yanıtları sıkıştırıyor; Unity Brotli/Gzip açık kalırsa çift sıkıştırma olur ve oyun açılmaz: *“double-compress” / “Unable to parse .framework.js.br”* hataları.)
+3. **File → Build Settings** → **Platform: WebGL** → **Switch Platform** → **Build** veya **Build And Run** → çıktıyı **`My project (1)/Builds/WEBGL`** klasörüne al.
 
-Çıktı: `index.html`, `Build/`, `TemplateData/`. Sonra bu dosyaları **repo kökündeki `webgl-deploy`** klasörüne kopyala (içindeki `index.html`, `Build/`, `TemplateData/` üzerine yaz). `webgl-deploy` içinde `vercel.json` ve `api/` zaten var; commit + push yap.
+Çıktı: `index.html`, `Build/` (artık `.data`, `.wasm`, `.js` — `.br` değil), `TemplateData/`. Bu dosyaları **repo kökündeki `webgl-deploy`** içine kopyala (`index.html`, `Build/`, `TemplateData/` üzerine yaz). `webgl-deploy` içinde `vercel.json` ve `api/` zaten var; commit + push yap.
 
 ---
 
@@ -60,6 +61,7 @@ Vercel Dashboard → Proje → **Settings → Environment Variables** bölümün
 
 ## Notlar
 
+- **Sıkıştırma:** Unity’de Compression Format = **Disabled** kullan. Vercel CDN tek sefer sıkıştırır; Unity’de Brotli/Gzip açıksa çift sıkıştırma hatası alırsın.
 - CORS: Aynı domain’de olduğu için ekstra ayar gerekmez.
 - Custom domain: Vercel’de domain ekleyip DNS’i ayarladıktan sonra aynı env’ler kullanılır.
 - Editor / standalone: WebGL dışında `.env` veya sistem env’i kullanılır; Vercel env’ler sadece WebGL deploy için.
