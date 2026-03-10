@@ -3,7 +3,9 @@
 **/[Tt]emp/
 **/[Oo]bj/
 **/[Bb]uild/
-**/[Bb]uilds/
+!**/[Bb]uilds/[Ww][Ee][Bb][Gg][Ll]/[Bb]uild/
+**/[Bb]uilds/*
+!**/[Bb]uilds/[Ww][Ee][Bb][Gg][Ll]/
 **/[Ll]ogs/
 **/[Uu]ser[Ss]ettings/
 **/[Mm]emoryCaptures/
