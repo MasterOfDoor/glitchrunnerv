@@ -11,7 +11,7 @@ Bu dosyada: WebGL build alma, Vercel’e yükleme ve **Vercel’de ayarlaman ger
    (Vercel zaten yanıtları sıkıştırıyor; Unity Brotli/Gzip açık kalırsa çift sıkıştırma olur ve oyun açılmaz: *“double-compress” / “Unable to parse .framework.js.br”* hataları.)
 3. **File → Build Settings** → **Platform: WebGL** → **Switch Platform** → **Build** veya **Build And Run** → çıktıyı **`My project (1)/Builds/WEBGL`** klasörüne al.
 
-Çıktı: `index.html`, `Build/` (artık `.data`, `.wasm`, `.js` — `.br` değil), `TemplateData/`. Bu dosyaları **repo kökündeki `webgl-deploy`** içine kopyala (`index.html`, `Build/`, `TemplateData/` üzerine yaz). `webgl-deploy` içinde `vercel.json` ve `api/` zaten var; commit + push yap.
+Çıktı: `index.html`, `Build/` (içinde **WEBGL.data**, **WEBGL.framework.js**, **WEBGL.wasm** — `.br` olmamalı), `TemplateData/`. Bu **Build/** içeriğini **repo kökündeki `webgl-deploy/Build/`** ile değiştir; `index.html` ve `TemplateData/` de üzerine yaz. Sonra commit + push. (Repoda `index.html` artık .br değil sıkıştırmasız dosyaları bekliyor; .br kullanma.)
 
 ---
 
