@@ -90,7 +90,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.875, y: 1.5625}
+  m_Size: {x: 3, y: 4}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -133,6 +133,11 @@ MonoBehaviour:
   dashSpeed: 15
   dashDuration: 0.2
   jumpForce: 12
+  groundCheck: {fileID: 0}
+  checkRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   rb: {fileID: 4593845592490378320}
   animator: {fileID: 459118689918225703}
 --- !u!50 &4593845592490378320

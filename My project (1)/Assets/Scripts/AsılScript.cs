@@ -18,7 +18,7 @@ public class AsılScript : MonoBehaviour
     public GameObject inventoryPanel; // LÜTFEN INSPECTOR'DAN PANELİ BURAYA SÜRÜKLE
     private bool isInventoryOpen = false;
 
-    // Bileşenler ve Değişkenler
+    private bool isDead = false;
     private Rigidbody2D rb;
     private Animator anim;
     private Vector2 moveInput;
@@ -46,11 +46,11 @@ public class AsılScript : MonoBehaviour
         }
 
         // --- 2. DURAKLATMA KONTROLÜ ---
-        if (isInventoryOpen)
+        if (isInventoryOpen || isDead)
         {
             rb.linearVelocity = Vector2.zero;
             anim.SetFloat("Speed", 0);
-            return; // Envanter açıkken aşağıyı okuma
+            return;
         }
 
         // --- 3. HAREKET GİRDİLERİ ---
@@ -152,10 +152,42 @@ public class AsılScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isInventoryOpen)
+        if (!isInventoryOpen && !isDead)
         {
             rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
         }
+        else if (isDead && rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("FallArea") && !isDead)
+            StartCoroutine(DieAndRespawn());
+    }
+
+    IEnumerator DieAndRespawn()
+    {
+        isDead = true;
+        if (anim != null)
+        {
+            anim.SetBool("isDead", true);
+            anim.SetTrigger("doDie");
+        }
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+        yield return new WaitForSeconds(1.07f);
+        GameObject spawn = GameObject.Find("SpawnPoint");
+        if (spawn != null)
+            transform.position = new Vector3(spawn.transform.position.x, spawn.transform.position.y, transform.position.z);
+        if (rb != null) rb.simulated = true;
+        isDead = false;
+        if (anim != null) anim.SetBool("isDead", false);
     }
 
     void UpdateAnimator()
