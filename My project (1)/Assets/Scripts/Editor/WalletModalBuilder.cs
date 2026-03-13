@@ -238,6 +238,43 @@ public static class WalletModalBuilder
                 walletUI.fadeGroup = fadeImg.GetComponent<CanvasGroup>();
         }
 
+        // WalletModalUI referanslarını doğrula / ata (prefab veya content eksikse doldur)
+        var modalUI = modalGO.GetComponent<WalletModalUI>();
+        if (modalUI == null)
+        {
+            Debug.LogError("[WalletModalBuilder] WalletModalUI component bulunamadı!");
+            return;
+        }
+        if (modalUI.walletRowPrefab == null)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/WalletRow.prefab");
+            if (prefab != null)
+            {
+                modalUI.walletRowPrefab = prefab;
+                Debug.Log("[WalletModalBuilder] walletRowPrefab atandı.");
+            }
+            else
+            {
+                Debug.LogWarning("[WalletModalBuilder] WalletRow.prefab bulunamadı! Elle oluştur.");
+            }
+        }
+        if (modalUI.walletListContent == null)
+        {
+            var content = modalGO.transform
+                .Find("WalletScroll/Viewport/Content")
+                ?.GetComponent<RectTransform>();
+            if (content != null)
+            {
+                modalUI.walletListContent = content;
+                Debug.Log("[WalletModalBuilder] walletListContent atandı.");
+            }
+            else
+            {
+                Debug.LogWarning("[WalletModalBuilder] Content objesi bulunamadı!");
+            }
+        }
+        EditorUtility.SetDirty(modalGO);
+
         // BootPanelController'a walletModalUI referansını ver
         var bpc = Object.FindObjectOfType<BootPanelController>();
         if (bpc != null)

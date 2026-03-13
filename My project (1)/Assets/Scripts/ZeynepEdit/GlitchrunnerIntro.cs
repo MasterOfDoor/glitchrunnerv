@@ -11,7 +11,8 @@ public class GlitchrunnerIntro : MonoBehaviour
     public float fadeDuration = 0.8f; // Geçiş hızı (saniye)
     
     [Header("Sahne Geçişi")]
-    public string nextSceneName; // Intro bitince açılacak sahnenin adı
+    [Tooltip("Karikatür bitince her zaman OgreticiSahne açılır; bu alan şu an kullanılmıyor.")]
+    public string nextSceneName = "OgreticiSahne";
 
     private int currentIndex = 0;
     private bool isTransitioning = false;
@@ -50,14 +51,12 @@ public class GlitchrunnerIntro : MonoBehaviour
         }
         else
         {
-            // Tek sefer sahne yükle (WebGL'de çift tıklama stack overflow önlemi)
+            // Karikatür bitince her zaman öğretici sahneye geç (Inspector’daki değer yok sayılır)
             _hasRequestedSceneLoad = true;
             isTransitioning = true;
-            Debug.Log("Intro bitti, sahne yükleniyor: " + nextSceneName);
-            if (!string.IsNullOrEmpty(nextSceneName))
-            {
-                SceneManager.LoadScene(nextSceneName);
-            }
+            const string tutorialScene = "OgreticiSahne";
+            Debug.Log("Intro bitti, sahne yükleniyor: " + tutorialScene);
+            SceneManager.LoadScene(tutorialScene);
         }
     }
 

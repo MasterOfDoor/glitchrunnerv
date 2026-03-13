@@ -45,6 +45,47 @@ public static class WalletConnectBridge
     }
 
     /// <summary>
+    /// Sadece AppKit'i initialize eder (modal açmaz). WalletModal sahnesi yüklendiğinde
+    /// AppKit hazır olması için çağrılabilir.
+    /// </summary>
+    public static async void EnsureInitializedAsync()
+    {
+        if (AppKit.Instance == null || AppKit.IsInitialized) return;
+        try
+        {
+            var metadata = new Metadata(
+                name: "GlitchRunner",
+                description: "On-chain puzzle platformer",
+                url: "https://glitchrunner.example.com",
+                iconUrl: "https://glitchrunner.example.com/logo.png"
+            );
+            var avalancheFuji = new Chain(
+                ChainConstants.Namespaces.Evm,
+                chainReference: "43113",
+                name: "Avalanche Fuji",
+                nativeCurrency: new Currency("Avalanche", "AVAX", 18),
+                blockExplorer: new BlockExplorer("Snowtrace", "https://testnet.snowtrace.io"),
+                rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
+                isTestnet: true,
+                imageUrl: "https://avatars.githubusercontent.com/u/42355201?s=200&v=4"
+            );
+            var config = new AppKitConfig(
+                projectId: EnvLoader.Get("REOWN_PROJECT_ID", "98c021d7980856feb52faa0f9c1d314c"),
+                metadata: metadata
+            )
+            {
+                supportedChains = new[] { avalancheFuji }
+            };
+            await AppKit.InitializeAsync(config);
+            Debug.Log("[WalletConnectBridge] AppKit initialized (EnsureInitializedAsync).");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("[WalletConnectBridge] EnsureInitializedAsync: " + ex.Message);
+        }
+    }
+
+    /// <summary>
     /// Async connection flow using Reown AppKit.
     /// </summary>
     static async void ConnectWithReownAsync(Action<string> onAddress, Action<string> onError)
@@ -60,12 +101,6 @@ public static class WalletConnectBridge
                     iconUrl: "https://glitchrunner.example.com/logo.png"
                 );
 
-<<<<<<< HEAD
-                var config = new AppKitConfig(
-                    projectId: EnvLoader.Get("REOWN_PROJECT_ID", "98c021d7980856feb52faa0f9c1d314c"),
-                    metadata: metadata
-                );
-=======
                 // Avalanche Fuji (eip155:43113) — oyun token'ı bu ağda; cüzdan ETH yerine Fuji'ye geçsin
                 var avalancheFuji = new Chain(
                     ChainConstants.Namespaces.Evm,
@@ -84,7 +119,6 @@ public static class WalletConnectBridge
                 {
                     supportedChains = new[] { avalancheFuji }
                 };
->>>>>>> 36b6cf30049d4f4c30389724499d4253fff5bcce
 
                 await AppKit.InitializeAsync(config);
             }

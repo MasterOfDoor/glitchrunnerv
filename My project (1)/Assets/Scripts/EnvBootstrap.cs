@@ -5,10 +5,12 @@ using UnityEngine.Networking;
 
 /// <summary>
 /// WebGL build'de Vercel /api/config'ten env yükler, sonra GameState'i oluşturur.
-/// Sadece UNITY_WEBGL build'de kullanılır; Editor ve standalone'da GameStateBootstrap doğrudan GameState oluşturur.
+/// Config 404 olsa bile varsayılan REOWN_PROJECT_ID atanır; cüzdan bağlantısı çalışabilir.
 /// </summary>
 public class EnvBootstrap : MonoBehaviour
 {
+    const string DefaultReownProjectId = "98c021d7980856feb52faa0f9c1d314c";
+
     [Serializable]
     class ConfigResponse
     {
@@ -27,6 +29,7 @@ public class EnvBootstrap : MonoBehaviour
     System.Collections.IEnumerator FetchConfigAndCreateGameState()
     {
         string configUrl = GetConfigUrl();
+        bool configOk = false;
         using (var req = UnityWebRequest.Get(configUrl))
         {
             yield return req.SendWebRequest();
@@ -44,6 +47,7 @@ public class EnvBootstrap : MonoBehaviour
                         ["AVALANCHE_DISTRIBUTOR_ADDRESS"] = data.AVALANCHE_DISTRIBUTOR_ADDRESS ?? ""
                     };
                     EnvLoader.SetFromDictionary(dict);
+                    configOk = true;
                 }
                 catch (Exception e)
                 {
@@ -52,9 +56,12 @@ public class EnvBootstrap : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[EnvBootstrap] Config request failed: " + req.error);
+                Debug.LogWarning("[EnvBootstrap] Config request failed: " + req.error + " — using default REOWN_PROJECT_ID.");
             }
         }
+
+        if (!configOk)
+            EnvLoader.SetFromDictionary(new Dictionary<string, string> { ["REOWN_PROJECT_ID"] = DefaultReownProjectId });
 
         CreateGameState();
         Destroy(gameObject);
