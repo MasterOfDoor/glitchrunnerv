@@ -15,6 +15,7 @@ public class GlitchrunnerIntro : MonoBehaviour
 
     private int currentIndex = 0;
     private bool isTransitioning = false;
+    private bool _hasRequestedSceneLoad;
 
     void Start()
     {
@@ -29,6 +30,7 @@ public class GlitchrunnerIntro : MonoBehaviour
 
     void Update()
     {
+        if (_hasRequestedSceneLoad) return;
         // Mouse sol veya sağ tık, Space veya Enter tuşuyla ilerle
         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) && !isTransitioning)
         {
@@ -38,8 +40,9 @@ public class GlitchrunnerIntro : MonoBehaviour
 
     void AdvanceIntro()
     {
+        if (_hasRequestedSceneLoad) return;
         currentIndex++;
-        
+
         if (currentIndex < introSprites.Length)
         {
             // Bir sonraki görsele yumuşak geçiş yap
@@ -47,7 +50,9 @@ public class GlitchrunnerIntro : MonoBehaviour
         }
         else
         {
-            // Bütün görseller bitti, ana oyuna geç
+            // Tek sefer sahne yükle (WebGL'de çift tıklama stack overflow önlemi)
+            _hasRequestedSceneLoad = true;
+            isTransitioning = true;
             Debug.Log("Intro bitti, sahne yükleniyor: " + nextSceneName);
             if (!string.IsNullOrEmpty(nextSceneName))
             {
