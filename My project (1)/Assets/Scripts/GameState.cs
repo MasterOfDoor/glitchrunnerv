@@ -70,6 +70,10 @@ public class GameState : MonoBehaviour
 
     public InventorySlotEntry GetInventorySlot(int index)
     {
+        // #region agent log
+        if (index < 0 || index >= inventorySlots.Count)
+            DebugAgentLog.Log("GameState.GetInventorySlot", "OutOfRange", "{\"index\":" + index + ",\"count\":" + inventorySlots.Count + "}", "E");
+        // #endregion
         if (index < 0 || index >= inventorySlots.Count) return null;
         return inventorySlots[index];
     }

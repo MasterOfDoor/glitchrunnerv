@@ -86,6 +86,13 @@ public class AvalancheWallet : MonoBehaviour
 
     IEnumerator GetBalanceRoutine(string ownerAddress, Action<decimal> onBalance, Action<string> onError)
     {
+        // #region agent log
+        bool configNull = config == null;
+        bool rpcEmpty = config != null && string.IsNullOrEmpty(config.rpcUrl);
+        bool tokenEmpty = config != null && string.IsNullOrEmpty(config.tokenContractAddress);
+        if (configNull || rpcEmpty || tokenEmpty)
+            DebugAgentLog.Log("AvalancheWallet.GetBalanceRoutine", "Config check", "{\"configNull\":" + configNull.ToString().ToLowerInvariant() + ",\"rpcEmpty\":" + rpcEmpty.ToString().ToLowerInvariant() + ",\"tokenEmpty\":" + tokenEmpty.ToString().ToLowerInvariant() + "}", "D");
+        // #endregion
         if (config == null || string.IsNullOrEmpty(config.tokenContractAddress))
         {
             onBalance?.Invoke(0m);

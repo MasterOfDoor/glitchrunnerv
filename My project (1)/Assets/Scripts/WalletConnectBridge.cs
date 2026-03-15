@@ -160,7 +160,9 @@ public static class WalletConnectBridge
             void Handler(object _, Connector.AccountConnectedEventArgs e)
             {
                 AppKit.AccountConnected -= Handler;
-
+                // #region agent log
+                DebugAgentLog.Log("WalletConnectBridge.Handler", "Handler unsubscribed", "{}", "C");
+                // #endregion
                 var account = AppKit.Account;
                 if (account != null && !string.IsNullOrEmpty(account.Address))
                     onAddress?.Invoke(account.Address);
@@ -169,10 +171,16 @@ public static class WalletConnectBridge
             }
 
             AppKit.AccountConnected += Handler;
+            // #region agent log
+            DebugAgentLog.Log("WalletConnectBridge.ConnectWithReownAsync", "Handler registered, calling OpenModal", "{}", "C");
+            // #endregion
             AppKit.OpenModal();
         }
         catch (Exception ex)
         {
+            // #region agent log
+            DebugAgentLog.Log("WalletConnectBridge.ConnectWithReownAsync", "Exception after handler/OpenModal", "{\"message\":\"" + (ex.Message ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"}", "C");
+            // #endregion
             Debug.LogError("[WalletConnectBridge] Reown connect failed: " + ex.Message);
             onError?.Invoke(ex.Message);
         }

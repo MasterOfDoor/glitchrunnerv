@@ -65,27 +65,31 @@ public static class InventoryPanelBuilder
         int refW = t != null ? t.referenceWidth : 640;
         int refH = t != null ? t.referenceHeight : 360;
         Color panelBg = t != null ? t.panelBackground : new Color(0.05f, 0.12f, 0.05f, 0.98f);
-        Color panelOut = t != null ? t.panelOutline : new Color(0f, 1f, 0.25f, 1f);
-        Vector2 outlineDist = t != null ? t.panelOutlineDistance : new Vector2(2, 2);
         Vector2 panelSize = t != null ? t.inventoryPanelSize : new Vector2(300, 270);
-        Color titleCol = t != null ? t.titleColor : new Color(0f, 1f, 0.25f, 1f);
+        Color borderColor = t != null ? t.panelOutline : new Color(0f, 0.85f, 0.3f, 0.55f);
+        Color titleCol = t != null ? t.titleColor : new Color(0f, 0.85f, 0.3f, 1f);
         int titleSize = t != null ? t.titleFontSize : 18;
         Color slotBg = t != null ? t.rowBackground : new Color(0.06f, 0.15f, 0.06f, 0.95f);
-        Color slotOut = t != null ? t.rowOutline : new Color(0f, 0.5f, 0.15f, 0.9f);
-        Vector2 slotOutDist = t != null ? t.rowOutlineDistance : new Vector2(1, 1);
+        const float borderWidth = 1f;
 
-        GameObject panel = new GameObject("InventoryPanel");
-        panel.transform.SetParent(canvasObj.transform, false);
+        var panelOuter = new GameObject("InventoryPanel");
+        panelOuter.transform.SetParent(canvasObj.transform, false);
+        RectTransform panelRectOut = panelOuter.AddComponent<RectTransform>();
+        panelRectOut.anchorMin = new Vector2(0.5f, 0.5f);
+        panelRectOut.anchorMax = new Vector2(0.5f, 0.5f);
+        panelRectOut.pivot = new Vector2(0.5f, 0.5f);
+        panelRectOut.sizeDelta = panelSize;
+        panelRectOut.anchoredPosition = Vector2.zero;
+        panelOuter.AddComponent<Image>().color = borderColor;
+
+        GameObject panel = new GameObject("InventoryPanel_Inner");
+        panel.transform.SetParent(panelOuter.transform, false);
         RectTransform panelRect = panel.AddComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(0.5f, 0.5f);
-        panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-        panelRect.pivot = new Vector2(0.5f, 0.5f);
-        panelRect.sizeDelta = panelSize;
-        panelRect.anchoredPosition = Vector2.zero;
+        panelRect.anchorMin = Vector2.zero;
+        panelRect.anchorMax = Vector2.one;
+        panelRect.offsetMin = new Vector2(borderWidth, borderWidth);
+        panelRect.offsetMax = new Vector2(-borderWidth, -borderWidth);
         panel.AddComponent<Image>().color = panelBg;
-        var outline = panel.AddComponent<Outline>();
-        outline.effectColor = panelOut;
-        outline.effectDistance = outlineDist;
 
         GameObject titleObj = new GameObject("Title");
         titleObj.transform.SetParent(panel.transform, false);
@@ -121,12 +125,20 @@ public static class InventoryPanelBuilder
         {
             GameObject slotObj = new GameObject("Slot" + i);
             slotObj.transform.SetParent(slotsRoot.transform, false);
-            slotObj.AddComponent<Image>().color = slotBg;
-            var slotOutline = slotObj.AddComponent<Outline>();
-            slotOutline.effectColor = slotOut;
-            slotOutline.effectDistance = slotOutDist;
+            slotObj.AddComponent<RectTransform>();
+            slotObj.AddComponent<Image>().color = new Color(0f, 0.85f, 0.3f, 0.25f);
+
+            var slotInner = new GameObject("Inner");
+            slotInner.transform.SetParent(slotObj.transform, false);
+            var innerRT = slotInner.AddComponent<RectTransform>();
+            innerRT.anchorMin = Vector2.zero;
+            innerRT.anchorMax = Vector2.one;
+            innerRT.offsetMin = new Vector2(1f, 1f);
+            innerRT.offsetMax = new Vector2(-1f, -1f);
+            slotInner.AddComponent<Image>().color = slotBg;
+
             GameObject iconObj = new GameObject("Icon");
-            iconObj.transform.SetParent(slotObj.transform, false);
+            iconObj.transform.SetParent(slotInner.transform, false);
             RectTransform iconRect = iconObj.AddComponent<RectTransform>();
             iconRect.anchorMin = Vector2.zero;
             iconRect.anchorMax = Vector2.one;
@@ -137,7 +149,7 @@ public static class InventoryPanelBuilder
             iconImg.enabled = false;
             iconImg.raycastTarget = false;
             GameObject labelObj = new GameObject("Label");
-            labelObj.transform.SetParent(slotObj.transform, false);
+            labelObj.transform.SetParent(slotInner.transform, false);
             RectTransform labelRect = labelObj.AddComponent<RectTransform>();
             labelRect.anchorMin = new Vector2(0, 0);
             labelRect.anchorMax = new Vector2(1, 0);
@@ -147,8 +159,8 @@ public static class InventoryPanelBuilder
             Text labelText = labelObj.AddComponent<Text>();
             labelText.text = "";
             labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            labelText.fontSize = 9;
-            labelText.color = new Color(0f, 1f, 0.35f);
+            labelText.fontSize = 12;
+            labelText.color = new Color(0f, 0.85f, 0.3f, 1f);
             labelText.alignment = TextAnchor.MiddleCenter;
             labelText.raycastTarget = false;
             InventorySlotUI slotUI = slotObj.AddComponent<InventorySlotUI>();
@@ -156,9 +168,9 @@ public static class InventoryPanelBuilder
             slotUI.labelText = labelText;
         }
 
-        panel.AddComponent<InventoryUI>();
-        panel.SetActive(false);
-        return panel;
+        panelOuter.AddComponent<InventoryUI>();
+        panelOuter.SetActive(false);
+        return panelOuter;
     }
 
     static void EnsureCanvasAndEventSystem()

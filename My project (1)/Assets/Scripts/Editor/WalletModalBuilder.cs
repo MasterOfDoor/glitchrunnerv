@@ -29,7 +29,6 @@ public static class WalletModalBuilder
         var old = uiCanvas.transform.Find("WalletModal");
         if (old) GameObject.DestroyImmediate(old.gameObject);
 
-        // ── Modal kök ────────────────────────────────────────────────────
         var modalGO = new GameObject("WalletModal");
         modalGO.transform.SetParent(uiCanvas.transform, false);
         var modalRT = modalGO.AddComponent<RectTransform>();
@@ -41,19 +40,21 @@ public static class WalletModalBuilder
         var modalCG = modalGO.AddComponent<CanvasGroup>();
         modalCG.alpha = 0f; modalCG.interactable = false; modalCG.blocksRaycasts = false;
 
-        // Arka plan
-        var modalBg = modalGO.AddComponent<Image>();
-        modalBg.color = new Color(0f, 0.012f, 0.004f, 0.95f);
-        var modalOL = modalGO.AddComponent<Outline>();
-        modalOL.effectColor = new Color(0f, 1f, 0.3f, 0.55f);
-        modalOL.effectDistance = new Vector2(1f, -1f);
+        modalGO.AddComponent<Image>().color = new Color(0f, 0.85f, 0.3f, 0.55f);
 
-        // Köşe süsleri
+        var modalInner = new GameObject("WalletModal_Inner");
+        modalInner.transform.SetParent(modalGO.transform, false);
+        var innerRT = modalInner.AddComponent<RectTransform>();
+        innerRT.anchorMin = Vector2.zero;
+        innerRT.anchorMax = Vector2.one;
+        innerRT.offsetMin = new Vector2(1f, 1f);
+        innerRT.offsetMax = new Vector2(-1f, -1f);
+        modalInner.AddComponent<Image>().color = new Color(0f, 0.012f, 0.004f, 0.95f);
+
         AddCornerDecor(modalGO.transform, modalRT.sizeDelta);
 
-        // ── Header ───────────────────────────────────────────────────────
         var headerGO = new GameObject("Header");
-        headerGO.transform.SetParent(modalGO.transform, false);
+        headerGO.transform.SetParent(modalInner.transform, false);
         var headerRT = headerGO.AddComponent<RectTransform>();
         headerRT.anchorMin = new Vector2(0f, 1f); headerRT.anchorMax = new Vector2(1f, 1f);
         headerRT.pivot = new Vector2(0.5f, 1f);
@@ -63,12 +64,12 @@ public static class WalletModalBuilder
         MakeTmpTxt("AuthLabel", headerGO.transform,
             "AUTHENTICATION MODULE",
             new Vector2(0, -10), new Vector2(280, 16),
-            new Color(0f, 1f, 0.3f, 0.85f), 9, FontStyle.Normal, TextAlignmentOptions.Center);
+            new Color(0f, 0.85f, 0.3f, 0.9f), 11, FontStyle.Normal, TextAlignmentOptions.Center);
 
         MakeTmpTxt("SelectLabel", headerGO.transform,
             "SELECT WALLET",
             new Vector2(0, -26), new Vector2(280, 20),
-            new Color(0f, 1f, 0.35f, 1.00f), 13, FontStyle.Bold, TextAlignmentOptions.Center);
+            new Color(0f, 0.85f, 0.3f, 1f), 14, FontStyle.Bold, TextAlignmentOptions.Center);
 
         // Ayırıcı
         var divGO = new GameObject("Divider"); divGO.transform.SetParent(headerGO.transform, false);
@@ -76,7 +77,7 @@ public static class WalletModalBuilder
         divRT.anchorMin = new Vector2(0f, 0f); divRT.anchorMax = new Vector2(1f, 0f);
         divRT.pivot = new Vector2(0.5f, 0f);
         divRT.offsetMin = new Vector2(12, -1); divRT.offsetMax = new Vector2(-12, 0);
-        divGO.AddComponent<Image>().color = new Color(0f, 1f, 0.3f, 0.12f);
+        divGO.AddComponent<Image>().color = new Color(0f, 1f, 0.3f, 0.25f);
 
         // Kapat butonu
         var closeGO = new GameObject("CloseBtn");
@@ -91,18 +92,25 @@ public static class WalletModalBuilder
             Vector2.zero, new Vector2(20, 20),
             new Color(1f, 0.1f, 0.05f, 0.7f), 12, FontStyle.Bold, TextAlignmentOptions.Center);
 
-        // ── Google Butonu ────────────────────────────────────────────────
         var googleGO = new GameObject("GoogleBtn");
-        googleGO.transform.SetParent(modalGO.transform, false);
+        googleGO.transform.SetParent(modalInner.transform, false);
         var googleRT = googleGO.AddComponent<RectTransform>();
         googleRT.anchorMin = new Vector2(0f, 1f); googleRT.anchorMax = new Vector2(1f, 1f);
         googleRT.pivot = new Vector2(0.5f, 1f);
         googleRT.offsetMin = new Vector2(12, -100); googleRT.offsetMax = new Vector2(-12, -54);
-        var googleImg = googleGO.AddComponent<Image>();
+        var googleOuter = new GameObject("GoogleBtn_Outer");
+        googleOuter.transform.SetParent(googleGO.transform, false);
+        var goOutRT = googleOuter.AddComponent<RectTransform>();
+        goOutRT.anchorMin = Vector2.zero; goOutRT.anchorMax = Vector2.one;
+        goOutRT.offsetMin = goOutRT.offsetMax = Vector2.zero;
+        googleOuter.AddComponent<Image>().color = new Color(0f, 0.85f, 0.3f, 0.55f);
+        var googleInner = new GameObject("GoogleBtn_Inner");
+        googleInner.transform.SetParent(googleOuter.transform, false);
+        var goInRT = googleInner.AddComponent<RectTransform>();
+        goInRT.anchorMin = Vector2.zero; goInRT.anchorMax = Vector2.one;
+        goInRT.offsetMin = new Vector2(1f, 1f); goInRT.offsetMax = new Vector2(-1f, -1f);
+        var googleImg = googleInner.AddComponent<Image>();
         googleImg.color = new Color(0f, 0.04f, 0.01f, 1f);
-        var googleOL = googleGO.AddComponent<Outline>();
-        googleOL.effectColor = new Color(0f, 1f, 0.3f, 0.38f);
-        googleOL.effectDistance = new Vector2(1f, -1f);
         var googleBtn = googleGO.AddComponent<Button>();
         var gColors = googleBtn.colors;
         gColors.normalColor      = new Color(0,0,0,0);
@@ -110,8 +118,7 @@ public static class WalletModalBuilder
         gColors.pressedColor     = new Color(0f, 1f, 0.3f, 0.18f);
         googleBtn.colors = gColors;
 
-        // Google logo (SVG yerine basit "G" — gerçek logo Resources'tan gelecek)
-        var gLogoGO = new GameObject("Logo"); gLogoGO.transform.SetParent(googleGO.transform, false);
+        var gLogoGO = new GameObject("Logo"); gLogoGO.transform.SetParent(googleInner.transform, false);
         var gLogoRT = gLogoGO.AddComponent<RectTransform>();
         gLogoRT.anchorMin = gLogoRT.anchorMax = new Vector2(0f, 0.5f);
         gLogoRT.pivot = new Vector2(0f, 0.5f);
@@ -120,18 +127,17 @@ public static class WalletModalBuilder
         gLogoImg.color = new Color(0.26f, 0.52f, 1f, 0.9f); // Google logo yüklenene kadar mavi
         // CURSOR NOTU: Resources.Load<Sprite>("WalletLogos/google") ile logoyu yükle
 
-        MakeTmpTxt("GoogleLabel", googleGO.transform,
+        MakeTmpTxt("GoogleLabel", googleInner.transform,
             "SIGN IN WITH GOOGLE",
             new Vector2(14, 0), new Vector2(220, 36),
-            new Color(0f, 1f, 0.35f, 1.00f), 13, FontStyle.Bold, TextAlignmentOptions.Left);
+            new Color(0f, 0.85f, 0.3f, 1f), 14, FontStyle.Bold, TextAlignmentOptions.Left);
 
-        MakeTmpTxt("GoogleArrow", googleGO.transform,
+        MakeTmpTxt("GoogleArrow", googleInner.transform,
             "▶",
             new Vector2(-10, 0), new Vector2(14, 36),
             new Color(0f, 1f, 0.3f, 0.30f), 10, FontStyle.Normal, TextAlignmentOptions.Right);
 
-        // ── Ayırıcı çizgi ────────────────────────────────────────────────
-        var sep = new GameObject("Separator"); sep.transform.SetParent(modalGO.transform, false);
+        var sep = new GameObject("Separator"); sep.transform.SetParent(modalInner.transform, false);
         var sepRT = sep.AddComponent<RectTransform>();
         sepRT.anchorMin = new Vector2(0f, 1f); sepRT.anchorMax = new Vector2(1f, 1f);
         sepRT.pivot = new Vector2(0.5f, 1f);
@@ -143,9 +149,8 @@ public static class WalletModalBuilder
             new Vector2(0, -6), new Vector2(80, 14),
             new Color(0f, 1f, 0.3f, 0.45f), 9, FontStyle.Normal, TextAlignmentOptions.Center);
 
-        // ── ScrollRect + Wallet List ──────────────────────────────────────
         var scrollGO = new GameObject("WalletScroll");
-        scrollGO.transform.SetParent(modalGO.transform, false);
+        scrollGO.transform.SetParent(modalInner.transform, false);
         var scrollRT = scrollGO.AddComponent<RectTransform>();
         scrollRT.anchorMin = new Vector2(0f, 0f); scrollRT.anchorMax = new Vector2(1f, 1f);
         scrollRT.offsetMin = new Vector2(12, 36); scrollRT.offsetMax = new Vector2(-12, -118);
@@ -224,7 +229,7 @@ public static class WalletModalBuilder
         walletUI.modalGroup        = modalCG;
         walletUI.modalPanel        = modalRT;
         walletUI.googleButton      = googleBtn;
-        walletUI.googleLabel       = googleGO.transform.Find("GoogleLabel")?.GetComponent<TextMeshProUGUI>();
+        walletUI.googleLabel       = googleInner.transform.Find("GoogleLabel")?.GetComponent<TextMeshProUGUI>();
         walletUI.walletListContent = contentRT;
         walletUI.walletRowPrefab   = prefabGO;
         walletUI.statusText        = statusTxt;
@@ -261,7 +266,7 @@ public static class WalletModalBuilder
         if (modalUI.walletListContent == null)
         {
             var content = modalGO.transform
-                .Find("WalletScroll/Viewport/Content")
+                .Find("WalletModal_Inner/WalletScroll/Viewport/Content")
                 ?.GetComponent<RectTransform>();
             if (content != null)
             {

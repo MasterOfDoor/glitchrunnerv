@@ -70,19 +70,27 @@ public class MarketUI : MonoBehaviour
         cs.matchWidthOrHeight = 0.5f;
         canvasObj.AddComponent<GraphicRaycaster>();
 
-        panel = new GameObject("MarketPanel");
-        panel.transform.SetParent(canvasObj.transform, false);
+        GameObject panelRoot = new GameObject("MarketPanel");
+        panelRoot.transform.SetParent(canvasObj.transform, false);
+        RectTransform prOut = panelRoot.AddComponent<RectTransform>();
+        prOut.anchorMin = prOut.anchorMax = new Vector2(0.5f, 0.5f);
+        prOut.sizeDelta = new Vector2(280, 220);
+        prOut.anchoredPosition = Vector2.zero;
+        panelRoot.AddComponent<Image>().color = new Color(0f, 0.85f, 0.3f, 0.55f);
 
-        RectTransform pr = panel.AddComponent<RectTransform>();
-        pr.anchorMin = pr.anchorMax = new Vector2(0.5f, 0.5f);
-        pr.sizeDelta = new Vector2(280, 220);
-        pr.anchoredPosition = Vector2.zero;
-        Image pImg = panel.AddComponent<Image>();
-        pImg.color = new Color(0.06f, 0.14f, 0.06f, 0.98f);
+        var panelInner = new GameObject("MarketPanel_Inner");
+        panelInner.transform.SetParent(panelRoot.transform, false);
+        var pr = panelInner.AddComponent<RectTransform>();
+        pr.anchorMin = Vector2.zero;
+        pr.anchorMax = Vector2.one;
+        pr.offsetMin = new Vector2(1f, 1f);
+        pr.offsetMax = new Vector2(-1f, -1f);
+        panelInner.AddComponent<Image>().color = new Color(0.06f, 0.14f, 0.06f, 0.98f);
 
+        panel = panelInner;
         float y = 90f;
 
-        Text title = CreateText(panel.transform, "MARKET", 20, new Color(0, 1f, 0.3f), 0, y);
+        Text title = CreateText(panel.transform, "MARKET", 20, new Color(0, 0.85f, 0.3f, 1f), 0, y);
         title.alignment = TextAnchor.MiddleLeft;
         RectTransform titleR = title.GetComponent<RectTransform>();
         titleR.anchorMin = new Vector2(0, 1);
@@ -91,7 +99,6 @@ public class MarketUI : MonoBehaviour
         titleR.anchoredPosition = new Vector2(0, -Padding);
         titleR.sizeDelta = new Vector2(-Padding * 2, 26);
 
-        // Coin yazısı: sağ üstte ama kapat butonunun solunda kalacak (gizlenmesin)
         GameObject coinObj = new GameObject("Coin");
         coinObj.transform.SetParent(panel.transform, false);
         RectTransform coinR = coinObj.AddComponent<RectTransform>();
@@ -103,14 +110,13 @@ public class MarketUI : MonoBehaviour
         balanceLabel = coinObj.AddComponent<Text>();
         balanceLabel.font = font;
         balanceLabel.fontSize = 14;
-        balanceLabel.color = new Color(0, 0.8f, 0.25f);
+        balanceLabel.color = new Color(0, 0.85f, 0.3f, 1f);
         balanceLabel.alignment = TextAnchor.MiddleRight;
 
         y = 70f;
         AddRow("Gun", "gun", 50m, ref y);
         AddRow("Spear", "spear", 30m, ref y);
 
-        // Kapat butonu: en sağ köşede, coin yazısının sağında
         GameObject closeBtn = new GameObject("CloseBtn");
         closeBtn.transform.SetParent(panel.transform, false);
         RectTransform closeR = closeBtn.AddComponent<RectTransform>();
@@ -130,6 +136,7 @@ public class MarketUI : MonoBehaviour
         closeTxtR.anchorMax = Vector2.one;
         closeTxtR.offsetMin = closeTxtR.offsetMax = Vector2.zero;
 
+        panel = panelRoot;
         RefreshCoin();
         panel.SetActive(false);
     }
@@ -176,7 +183,7 @@ public class MarketUI : MonoBehaviour
         Image rowBg = row.AddComponent<Image>();
         rowBg.color = new Color(0.08f, 0.18f, 0.08f, 0.95f);
 
-        Text labelTxt = CreateText(row.transform, label + " - " + price + " coin", 14, new Color(0, 1f, 0.35f), -60, 0);
+        Text labelTxt = CreateText(row.transform, label + " - " + price + " coin", 14, new Color(0, 0.85f, 0.3f, 1f), -60, 0);
         labelTxt.alignment = TextAnchor.MiddleLeft;
         RectTransform labelR = labelTxt.GetComponent<RectTransform>();
         labelR.anchorMin = new Vector2(0, 0);
@@ -198,12 +205,21 @@ public class MarketUI : MonoBehaviour
         string id = itemId;
         b.onClick.AddListener(() => Buy(id, p));
 
-        Text btnTxt = CreateText(btn.transform, "Buy", 12, new Color(0, 1f, 0.3f), 0, 0);
+        Text btnTxt = CreateText(btn.transform, "Buy", 12, new Color(0, 0.85f, 0.3f, 1f), 0, 0);
         btnTxt.alignment = TextAnchor.MiddleCenter;
         RectTransform btnTxtR = btnTxt.GetComponent<RectTransform>();
         btnTxtR.anchorMin = Vector2.zero;
         btnTxtR.anchorMax = Vector2.one;
         btnTxtR.offsetMin = btnTxtR.offsetMax = Vector2.zero;
+
+        var sep = new GameObject("Separator");
+        sep.transform.SetParent(row.transform, false);
+        var sepRT = sep.AddComponent<RectTransform>();
+        sepRT.anchorMin = new Vector2(0f, 0f);
+        sepRT.anchorMax = new Vector2(1f, 0f);
+        sepRT.pivot = new Vector2(0.5f, 0f);
+        sepRT.sizeDelta = new Vector2(0f, 1f);
+        sep.AddComponent<Image>().color = new Color(0f, 1f, 0.3f, 0.08f);
 
         y += RowHeight + 6;
     }

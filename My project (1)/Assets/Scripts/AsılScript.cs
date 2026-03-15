@@ -24,6 +24,10 @@ public class AsılScript : MonoBehaviour
     [Tooltip("Child objesinin SpriteRenderer'ı (yön ile senkron için).")]
     public SpriteRenderer vfxSr;
 
+    [Header("HUD (HP / Stamina barları)")]
+    [Tooltip("Sağ üstteki HP-Stamina bar. Inspector'dan HUDPanel'i sürükle; boş bırakırsan PlayerHUD.Instance kullanılır.")]
+    public PlayerHUD hud;
+
     private bool isDead = false;
     private Rigidbody2D rb;
     private Animator anim;
@@ -38,6 +42,9 @@ public class AsılScript : MonoBehaviour
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
         currentAmmo = maxAmmo;
+
+        // HUD referansı yoksa singleton'dan al (Tools → Build Player HUD ile oluşturulduysa)
+        if (hud == null) hud = PlayerHUD.Instance;
 
         // Oyun başlarken her şeyi sıfırla
         Time.timeScale = 1f;
@@ -79,6 +86,7 @@ public class AsılScript : MonoBehaviour
         // --- 5. DASH (Ctrl) ---
         if (Input.GetKeyDown(KeyCode.LeftControl) && moveInput != Vector2.zero)
         {
+            if (hud != null) hud.UseStamina(15f); // Dash stamina harcar
             anim.SetInteger("WeaponType", weaponType);
             anim.SetTrigger("doDash");
             rb.AddForce(moveInput * dashForce, ForceMode2D.Impulse);
@@ -99,7 +107,16 @@ public class AsılScript : MonoBehaviour
         // --- 7. ATEŞ / SALDIRI ---
         HandleAttack();
 
-        // --- 8. ANIMATOR GÜNCELLE ---
+        // --- 8. Stamina: koşarken harca, dururken kazan ---
+        if (hud != null)
+        {
+            if (isRunning && moveInput.sqrMagnitude > 0.01f)
+                hud.UseStamina(8f * Time.deltaTime);
+            else
+                hud.RecoverStamina(5f * Time.deltaTime);
+        }
+
+        // --- 9. ANIMATOR GÜNCELLE ---
         UpdateAnimator();
     }
 
@@ -192,6 +209,7 @@ public class AsılScript : MonoBehaviour
     IEnumerator DieAndRespawn()
     {
         isDead = true;
+        if (hud != null) hud.DamageHp(25f); // Düşünce can azalır
         if (vfxAnimator != null)
         {
             if (weaponType == 0) vfxAnimator.SetTrigger("playDeathNormal");
