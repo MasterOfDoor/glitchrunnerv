@@ -52,11 +52,10 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/WEBGL.loader.js?" + Date.now();
+      var loaderUrl = buildUrl + "/WEBGL.loader.js";
       var config = {
         arguments: [],
         dataUrl: buildUrl + "/WEBGL.data",
-        cacheControl: "no-store",
         frameworkUrl: buildUrl + "/WEBGL.framework.js",
         codeUrl: buildUrl + "/WEBGL.wasm",
         streamingAssetsUrl: "StreamingAssets",

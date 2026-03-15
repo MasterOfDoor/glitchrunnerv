@@ -1053,7 +1053,7 @@ MonoBehaviour:
   interactionRadius: 2
   player: {fileID: 0}
   tmpText: {fileID: 0}
-  fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
+  fontAsset: {fileID: 11400000, guid: 17905a176cb39d3418e58bec492ca0f0, type: 2}
   textColor: {r: 0, g: 1, b: 0.53, a: 1}
   fontSize: 36
   fontSizeMin: 18
@@ -4739,7 +4739,7 @@ MonoBehaviour:
   interactionRadius: 2
   player: {fileID: 0}
   tmpText: {fileID: 0}
-  fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
+  fontAsset: {fileID: 11400000, guid: 17905a176cb39d3418e58bec492ca0f0, type: 2}
   textColor: {r: 0, g: 1, b: 0.53, a: 1}
   fontSize: 36
   fontSizeMin: 18
@@ -5561,7 +5561,7 @@ MonoBehaviour:
   interactionRadius: 2
   player: {fileID: 0}
   tmpText: {fileID: 0}
-  fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
+  fontAsset: {fileID: 11400000, guid: 17905a176cb39d3418e58bec492ca0f0, type: 2}
   textColor: {r: 0, g: 1, b: 0.53, a: 1}
   fontSize: 36
   fontSizeMin: 18
@@ -5987,7 +5987,7 @@ MonoBehaviour:
   interactionRadius: 3
   player: {fileID: 0}
   tmpText: {fileID: 0}
-  fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
+  fontAsset: {fileID: 11400000, guid: 17905a176cb39d3418e58bec492ca0f0, type: 2}
   textColor: {r: 0, g: 1, b: 0.53, a: 1}
   fontSize: 36
   fontSizeMin: 18
@@ -6010,7 +6010,7 @@ MonoBehaviour:
   interactionDistance: 2
   lines:
   - Woooooow
-  player: {fileID: 0}
+  player: {fileID: 720590404}
   fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
   labelHeightOffset: 1.8
   labelScale: 0.01
@@ -6102,7 +6102,7 @@ MonoBehaviour:
   interactionRadius: 2
   player: {fileID: 0}
   tmpText: {fileID: 0}
-  fontAsset: {fileID: 11400000, guid: 81db8b07940d89a42a6d1f2e4922420c, type: 2}
+  fontAsset: {fileID: 11400000, guid: 17905a176cb39d3418e58bec492ca0f0, type: 2}
   textColor: {r: 0, g: 1, b: 0.53, a: 1}
   fontSize: 36
   fontSizeMin: 18
